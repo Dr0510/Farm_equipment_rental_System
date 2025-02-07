@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Equipment Rental</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Farm Equipment Rental</h1>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#equipment">Equipment</a></li>
+                <li><a href="#signup">Sign Up</a></li>
+                <li><a href="#login">Login</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <section id="home">
+        <h2>Find the Best Equipment for Your Farm</h2>
+        <input type="text" id="search" placeholder="Search Equipment...">
+        <button id="searchButton">Search</button>
+    </section>
+    
+    <section id="equipment">
+        <h2>Available Equipment</h2>
+        <div class="equipment-list">
+            <div class="equipment-item">
+                <img src="/Img/tractor.jpeg" alt="Tractor">
+                <h3>Tractor</h3>
+                <p>Rent: ₹2000/day</p>
+                <button>Rent Now</button>
+            </div>
+            <div class="equipment-item">
+                <img src="/Img/harvester.jpeg" alt="Harvester">
+                <h3>Harvester</h3>
+                <p>Rent: ₹5000/day</p>
+                <button>Rent Now</button>
+            </div>
+        </div>
+    </section>
+    
+    <section id="signup" class="form-container">
+        <h2>Sign Up</h2>
+        <form id="signupForm">
+            <input type="text" placeholder="Full Name" required>
+            <input type="email" placeholder="Email" required>
+            <input type="password" placeholder="Password" required>
+            <input type="submit" value="Sign Up">
+        </form>
+    </section>
+    
+    <section id="login" class="form-container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <input type="email" placeholder="Email" required>
+            <input type="password" placeholder="Password" required>
+            <input type="submit" value="Login">
+        </form>
+    </section>
+    
+    <footer>
+        <p>Contact us at: support@farmrental.com</p>
+    </footer>
+    
+    <script src="script.js"></script>
+</body>
+</html>
