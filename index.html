@@ -1,120 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farm Equipment Rental</title>
-    <link rel="stylesheet" href="/src/style.css">
-</head>
-<body>
-    <header>
-        <div class="header-content">
-            <h1>🚜 Farm Equipment Rental</h1>
-            <nav>
-                <ul>
-                    <li><a href="#home" class="nav-link">Home</a></li>
-                    <li><a href="#equipment" class="nav-link">Equipment</a></li>
-                    <li><a href="#signup" class="nav-link">Sign Up</a></li>
-                    <li><a href="#login" class="nav-link">Login</a></li>
-                    <li><a href="#contact" class="nav-link">Contact</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-    
-    <main>
-        <section id="home" class="hero-section">
-            <div class="hero-content">
-                <h2>Find the Best Equipment for Your Farm</h2>
-                <p>Rent high-quality agricultural equipment at affordable prices</p>
-                <div class="search-container">
-                    <input type="text" id="search" placeholder="Search Equipment..." class="search-input">
-                    <button id="searchButton" class="search-btn">🔍 Search</button>
-                </div>
-            </div>
-        </section>
-        
-        <section id="equipment" class="equipment-section">
-            <div class="container">
-                <h2>Available Equipment</h2>
-                <div class="equipment-grid" id="equipmentGrid">
-                    <!-- Equipment items will be populated by JavaScript -->
-                </div>
-            </div>
-        </section>
-        
-        <section id="signup" class="form-section">
-            <div class="form-container">
-                <h2>Sign Up</h2>
-                <form id="signupForm" class="auth-form">
-                    <div class="input-group">
-                        <input type="text" id="fullName" placeholder="Full Name" required>
-                    </div>
-                    <div class="input-group">
-                        <input type="email" id="signupEmail" placeholder="Email" required>
-                    </div>
-                    <div class="input-group">
-                        <input type="password" id="signupPassword" placeholder="Password" required>
-                    </div>
-                    <button type="submit" class="submit-btn">Sign Up</button>
-                </form>
-            </div>
-        </section>
-        
-        <section id="login" class="form-section">
-            <div class="form-container">
-                <h2>Login</h2>
-                <form id="loginForm" class="auth-form">
-                    <div class="input-group">
-                        <input type="email" id="loginEmail" placeholder="Email" required>
-                    </div>
-                    <div class="input-group">
-                        <input type="password" id="loginPassword" placeholder="Password" required>
-                    </div>
-                    <button type="submit" class="submit-btn">Login</button>
-                </form>
-            </div>
-        </section>
-
-        <section id="contact" class="contact-section">
-            <div class="container">
-                <h2>Contact Us</h2>
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <h3>📧 Email</h3>
-                        <p>support@farmrental.com</p>
-                    </div>
-                    <div class="contact-item">
-                        <h3>📞 Phone</h3>
-                        <p>+91 98765 43210</p>
-                    </div>
-                    <div class="contact-item">
-                        <h3>📍 Address</h3>
-                        <p>123 Farm Street, Agricultural District</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-    
-    <footer>
-        <div class="footer-content">
-            <p>&copy; 2025 Farm Equipment Rental. All rights reserved.</p>
-            <p>Contact us at: support@farmrental.com</p>
-        </div>
-    </footer>
-
-    <!-- Rental Modal -->
-    <div id="rentalModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Rent Equipment</h2>
-            <div id="modalContent">
-                <!-- Modal content will be populated by JavaScript -->
-            </div>
-        </div>
-    </div>
-    
-    <script type="module" src="/src/main.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/tractor-icon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FarmRent - Premium Equipment Rental Platform</title>
+    <meta name="description" content="Connect with trusted equipment owners and rent high-quality farm equipment for your agricultural needs." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
