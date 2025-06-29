@@ -21,8 +21,7 @@ interface RegisterFormData {
 const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const { signUp } = useAuth()
+  const { signUp, loading } = useAuth()
   const navigate = useNavigate()
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm<RegisterFormData>({
@@ -39,15 +38,11 @@ const Register: React.FC = () => {
       return
     }
 
-    try {
-      setLoading(true)
-      const { confirmPassword, ...userData } = data
-      await signUp(data.email, data.password, userData)
+    const { confirmPassword, ...userData } = data
+    const success = await signUp(data.email, data.password, userData)
+    
+    if (success) {
       navigate('/login')
-    } catch (error) {
-      // Error is handled in the auth context
-    } finally {
-      setLoading(false)
     }
   }
 

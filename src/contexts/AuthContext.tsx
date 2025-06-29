@@ -8,7 +8,7 @@ interface AuthContextType {
   user: User | null
   supabaseUser: SupabaseUser | null
   loading: boolean
-  signUp: (email: string, password: string, userData: Partial<User>) => Promise<void>
+  signUp: (email: string, password: string, userData: Partial<User>) => Promise<boolean>
   signIn: (email: string, password: string) => Promise<void>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<User>) => Promise<void>
@@ -75,7 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
-  const signUp = async (email: string, password: string, userData: Partial<User>) => {
+  const signUp = async (email: string, password: string, userData: Partial<User>): Promise<boolean> => {
     try {
       setLoading(true)
       
@@ -90,26 +90,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       })
 
-      if (error) throw error
+      if (error) {
+        // Handle known errors without throwing
+        if (error.message?.includes('User already registered') || 
+            error.message?.includes('user_already_exists') ||
+            error.code === 'user_already_exists') {
+          toast.error('This email is already registered. Please sign in instead.')
+          return false
+        } else if (error.message?.includes('Invalid email')) {
+          toast.error('Please enter a valid email address.')
+          return false
+        } else if (error.message?.includes('Password should be at least')) {
+          toast.error('Password should be at least 6 characters long.')
+          return false
+        } else {
+          toast.error(error.message || 'Failed to create account')
+          return false
+        }
+      }
 
       if (data.user && !data.session) {
         toast.success('Please check your email to verify your account before signing in.')
       } else {
         toast.success('Account created successfully!')
       }
+      
+      return true
     } catch (error: any) {
-      if (error.message?.includes('User already registered') || 
-          error.message?.includes('user_already_exists') ||
-          error.code === 'user_already_exists') {
-        toast.error('This email is already registered. Please sign in instead.')
-      } else if (error.message?.includes('Invalid email')) {
-        toast.error('Please enter a valid email address.')
-      } else if (error.message?.includes('Password should be at least')) {
-        toast.error('Password should be at least 6 characters long.')
-      } else {
-        toast.error(error.message || 'Failed to create account')
-      }
-      throw error
+      toast.error(error.message || 'Failed to create account')
+      return false
     } finally {
       setLoading(false)
     }
