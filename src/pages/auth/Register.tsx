@@ -37,7 +37,7 @@ const Register: React.FC = () => {
 
     try {
       setLoading(true)
-      const { confirmPassword, ...userData } = data
+      const { password, confirmPassword, ...userData } = data
       await signUp(data.email, data.password, userData)
       navigate('/login')
     } catch (error) {
