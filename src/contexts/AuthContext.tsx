@@ -8,7 +8,7 @@ interface AuthContextType {
   user: User | null
   supabaseUser: SupabaseUser | null
   loading: boolean
-  signUp: (email: string, password: string, userData: Partial<User>) => Promise<boolean>
+  signUp: (email: string, password: string, fullName: string, userType: string) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<User>) => Promise<void>
@@ -31,18 +31,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSupabaseUser(session?.user ?? null)
-      if (session?.user) {
-        fetchUserProfile(session.user.id)
-      } else {
+    const getSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        setSupabaseUser(session?.user ?? null)
+        
+        if (session?.user) {
+          await fetchUserProfile(session.user.id)
+        } else {
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error('Error getting session:', error)
         setLoading(false)
       }
-    })
+    }
+
+    getSession()
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email)
         setSupabaseUser(session?.user ?? null)
         
         if (session?.user) {
@@ -65,60 +75,69 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('id', userId)
         .single()
 
-      if (error) throw error
-      setUser(data)
-    } catch (error: any) {
+      if (error) {
+        console.error('Profile fetch error:', error)
+        // If profile doesn't exist, user might need to complete registration
+        setUser(null)
+      } else {
+        setUser(data)
+      }
+    } catch (error) {
       console.error('Error fetching user profile:', error)
-      toast.error('Failed to load user profile')
     } finally {
       setLoading(false)
     }
   }
 
-  const signUp = async (email: string, password: string, userData: Partial<User>): Promise<boolean> => {
+  const signUp = async (email: string, password: string, fullName: string, userType: string) => {
     try {
       setLoading(true)
       
+      // First, sign up the user
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            full_name: userData.full_name,
-            user_type: userData.user_type
+            full_name: fullName,
+            user_type: userType
           }
         }
       })
 
       if (error) {
-        // Handle known errors without throwing
-        if (error.message?.includes('User already registered') || 
-            error.message?.includes('user_already_exists') ||
-            error.code === 'user_already_exists') {
+        if (error.message.includes('User already registered')) {
           toast.error('This email is already registered. Please sign in instead.')
-          return false
-        } else if (error.message?.includes('Invalid email')) {
-          toast.error('Please enter a valid email address.')
-          return false
-        } else if (error.message?.includes('Password should be at least')) {
-          toast.error('Password should be at least 6 characters long.')
-          return false
         } else {
-          toast.error(error.message || 'Failed to create account')
-          return false
+          toast.error(error.message)
         }
+        throw error
       }
 
-      if (data.user && !data.session) {
-        toast.success('Please check your email to verify your account before signing in.')
-      } else {
-        toast.success('Account created successfully!')
+      if (data.user) {
+        // Create profile manually if needed
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            email: data.user.email!,
+            full_name: fullName,
+            user_type: userType
+          })
+
+        if (profileError && !profileError.message.includes('duplicate key')) {
+          console.error('Profile creation error:', profileError)
+        }
+
+        if (data.session) {
+          toast.success('Account created successfully!')
+        } else {
+          toast.success('Please check your email to verify your account.')
+        }
       }
-      
-      return true
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create account')
-      return false
+      console.error('Sign up error:', error)
+      throw error
     } finally {
       setLoading(false)
     }
@@ -133,18 +152,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password,
       })
 
-      if (error) throw error
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          toast.error('Invalid email or password')
+        } else if (error.message.includes('Email not confirmed')) {
+          toast.error('Please verify your email address first')
+        } else {
+          toast.error(error.message)
+        }
+        throw error
+      }
 
       toast.success('Welcome back!')
     } catch (error: any) {
-      if (error.message?.includes('Invalid login credentials') || 
-          error.message?.includes('Email not confirmed')) {
-        toast.error('Invalid email or password. Please check your credentials.')
-      } else if (error.message?.includes('Email not confirmed')) {
-        toast.error('Please verify your email address before signing in.')
-      } else {
-        toast.error(error.message || 'Failed to sign in')
-      }
+      console.error('Sign in error:', error)
       throw error
     } finally {
       setLoading(false)
@@ -155,9 +176,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
+      
+      setUser(null)
+      setSupabaseUser(null)
       toast.success('Signed out successfully')
     } catch (error: any) {
-      toast.error(error.message || 'Failed to sign out')
+      console.error('Sign out error:', error)
+      toast.error('Failed to sign out')
       throw error
     }
   }
@@ -176,7 +201,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser({ ...user, ...updates })
       toast.success('Profile updated successfully')
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update profile')
+      console.error('Update profile error:', error)
+      toast.error('Failed to update profile')
       throw error
     }
   }

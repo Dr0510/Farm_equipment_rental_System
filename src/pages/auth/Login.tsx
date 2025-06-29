@@ -12,8 +12,8 @@ interface LoginFormData {
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const { signIn } = useAuth()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { signIn, loading } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -23,15 +23,17 @@ const Login: React.FC = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      setLoading(true)
+      setIsSubmitting(true)
       await signIn(data.email, data.password)
       navigate(from, { replace: true })
     } catch (error) {
       // Error is handled in the auth context
     } finally {
-      setLoading(false)
+      setIsSubmitting(false)
     }
   }
+
+  const isLoading = loading || isSubmitting
 
   return (
     <div className="min-h-screen gradient-bg flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -131,10 +133,10 @@ const Login: React.FC = () => {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isLoading}
               className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? (
+              {isLoading ? (
                 <div className="flex items-center justify-center gap-2">
                   <LoadingSpinner size="sm" />
                   Signing in...

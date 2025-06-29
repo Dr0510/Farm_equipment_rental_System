@@ -11,16 +11,12 @@ interface RegisterFormData {
   password: string
   confirmPassword: string
   user_type: 'renter' | 'owner' | 'both'
-  phone?: string
-  address?: string
-  city?: string
-  state?: string
-  zip_code?: string
 }
 
 const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const { signUp, loading } = useAuth()
   const navigate = useNavigate()
 
@@ -38,13 +34,18 @@ const Register: React.FC = () => {
       return
     }
 
-    const { confirmPassword, ...userData } = data
-    const success = await signUp(data.email, data.password, userData)
-    
-    if (success) {
+    try {
+      setIsSubmitting(true)
+      await signUp(data.email, data.password, data.full_name, data.user_type)
       navigate('/login')
+    } catch (error) {
+      // Error is handled in the auth context
+    } finally {
+      setIsSubmitting(false)
     }
   }
+
+  const isLoading = loading || isSubmitting
 
   return (
     <div className="min-h-screen gradient-bg py-12 px-4 sm:px-6 lg:px-8">
@@ -239,76 +240,6 @@ const Register: React.FC = () => {
               </div>
             </div>
 
-            {/* Contact Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number (Optional)
-                </label>
-                <input
-                  id="phone"
-                  type="tel"
-                  {...register('phone')}
-                  className="input-field"
-                  placeholder="Enter your phone number"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
-                  City (Optional)
-                </label>
-                <input
-                  id="city"
-                  type="text"
-                  {...register('city')}
-                  className="input-field"
-                  placeholder="Enter your city"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
-                Address (Optional)
-              </label>
-              <input
-                id="address"
-                type="text"
-                {...register('address')}
-                className="input-field"
-                placeholder="Enter your address"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-2">
-                  State (Optional)
-                </label>
-                <input
-                  id="state"
-                  type="text"
-                  {...register('state')}
-                  className="input-field"
-                  placeholder="Enter your state"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="zip_code" className="block text-sm font-medium text-gray-700 mb-2">
-                  ZIP Code (Optional)
-                </label>
-                <input
-                  id="zip_code"
-                  type="text"
-                  {...register('zip_code')}
-                  className="input-field"
-                  placeholder="Enter your ZIP code"
-                />
-              </div>
-            </div>
-
             <div className="flex items-center">
               <input
                 id="terms"
@@ -331,10 +262,10 @@ const Register: React.FC = () => {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isLoading}
               className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? (
+              {isLoading ? (
                 <div className="flex items-center justify-center gap-2">
                   <LoadingSpinner size="sm" />
                   Creating account...
