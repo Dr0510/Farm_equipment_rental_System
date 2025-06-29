@@ -25,7 +25,11 @@ const Register: React.FC = () => {
   const { signUp } = useAuth()
   const navigate = useNavigate()
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<RegisterFormData>()
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<RegisterFormData>({
+    defaultValues: {
+      user_type: 'renter'
+    }
+  })
 
   const password = watch('password')
   const userType = watch('user_type')
@@ -37,7 +41,7 @@ const Register: React.FC = () => {
 
     try {
       setLoading(true)
-      const { password, confirmPassword, ...userData } = data
+      const { confirmPassword, ...userData } = data
       await signUp(data.email, data.password, userData)
       navigate('/login')
     } catch (error) {
